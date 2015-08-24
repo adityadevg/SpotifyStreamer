@@ -36,11 +36,34 @@ public class TopTracksActivityFragment extends Fragment {
     private SpotifyApi api;
     private SpotifyService spotifyService;
     private List<Tracks> localListOfTracks = new ArrayList<Tracks>();
+    String artistId, artistName;
 
     public TopTracksActivityFragment() {
         listOfTracks = new ArrayList<Tracks>();
         api = new SpotifyApi();
         spotifyService = api.getService();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        bundle.putParcelableArrayList(getString(R.string.tracklist_parcel_key), (ArrayList<? extends Parcelable>) listOfTracks);
+        super.onSaveInstanceState(bundle);
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.track_parcel_key))) {
+            // get artist name from previous intent
+            Intent intent = getActivity().getIntent();
+            artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
+            artistName = intent.getStringExtra(getString(R.string.artist_name_key));
+            new FetchTracksTask().execute(artistId);
+        } else {
+            listOfTracks = savedInstanceState.getParcelableArrayList(getString(R.string.track_parcel_key));
+        }
     }
 
     @Override
@@ -51,7 +74,7 @@ public class TopTracksActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent newIntent = new Intent(getActivity(), MediaActivity.class);
+                Intent newIntent = new Intent(getActivity(), MediaPlayerActivity.class);
                 newIntent.putParcelableArrayListExtra(getString(R.string.track_list_key), (ArrayList<? extends Parcelable>) listOfTracks);
                 newIntent.putExtra(getString(R.string.track_position_key), position);
                 startActivity(newIntent);
@@ -103,6 +126,7 @@ public class TopTracksActivityFragment extends Fragment {
                             String trackName;
                             String artistName;
                             String previewUrl;
+                            String externalSpotifyLink;
 
                             kaaes.spotify.webapi.android.models.Track currentTrack;
                             for (int i = 0; i < size; i++) {
@@ -111,11 +135,12 @@ public class TopTracksActivityFragment extends Fragment {
                                     albumName = currentTrack.album.name;
                                     artistName = currentTrack.artists.get(0).name;
                                     previewUrl = currentTrack.preview_url;
+                                    externalSpotifyLink = currentTrack.external_urls.get("spotify");
                                     if (null != currentTrack.album.images && !currentTrack.album.images.isEmpty()) {
                                         albumThumbnailLink = currentTrack.album.images.get(0).url;
                                         trackName = currentTrack.name;
 
-                                        localListOfTracks.add(new Tracks(albumName, albumThumbnailLink, trackName, artistName, previewUrl));
+                                        localListOfTracks.add(new Tracks(albumName, albumThumbnailLink, trackName, artistName, previewUrl, externalSpotifyLink));
                                     }
                                 }
                             }

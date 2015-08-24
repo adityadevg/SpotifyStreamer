@@ -3,6 +3,7 @@
     package="com.adityadevg.spotifystreamer" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -24,18 +25,34 @@
             android:name=".TopTracksActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_top_tracks"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainArtistActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adityadevg.spotifystreamer.MainArtistActivity" />
         </activity>
         <activity
-            android:name=".MediaActivity"
+            android:name=".MediaPlayerActivity"
             android:label="@string/title_activity_media"
             android:parentActivityName=".TopTracksActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adityadevg.spotifystreamer.TopTracksActivity" />
+        </activity>
+
+        <service
+            android:name=".MediaService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MediaPlayerActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.adityadevg.spotifystreamer.MediaPlayerActivity" />
         </activity>
     </application>
 

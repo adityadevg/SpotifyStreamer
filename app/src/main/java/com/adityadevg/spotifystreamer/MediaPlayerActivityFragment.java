@@ -59,7 +59,7 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
     ImageView albumImage_iv;
     ImageButton prevTrack_ib;
     ImageButton playPauseTrack_ib;
-    ImageButton nextTrack_iv;
+    ImageButton nextTrack_ib;
     TextView elapsedTime_tv;
     TextView trackDuration_tv;
     SeekBar seekBar;
@@ -133,16 +133,10 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
         albumImage_iv = (ImageView) rootView.findViewById(R.id.albumArtImageView);
         prevTrack_ib = (ImageButton) rootView.findViewById(R.id.prevTrackBtn);
         playPauseTrack_ib = (ImageButton) rootView.findViewById(R.id.pauseTrackBtn);
-        nextTrack_iv = (ImageButton) rootView.findViewById(R.id.nextTrackBtn);
+        nextTrack_ib = (ImageButton) rootView.findViewById(R.id.nextTrackBtn);
         seekBar = (SeekBar) rootView.findViewById(R.id.mediaSeekBar);
         elapsedTime_tv = (TextView) rootView.findViewById(R.id.elapsedTimeTextView);
         trackDuration_tv = (TextView) rootView.findViewById(R.id.trackDurationTextView);
-
-        albumName_tv.setText(currentTrack.getAlbumName());
-        mediaTrackName_tv.setText(currentTrack.getTrackName());
-        artistName_tv.setText(currentTrack.getArtistName());
-        currentTrack = tracksList.get(position);
-        previewUrl = currentTrack.getPreviewUrl();
 
         notificationsToggleMenu = (ToggleButton) inflater.inflate(R.layout.toggle_switch, container, false).findViewById(R.id.switchForActionBar);
         notificationsToggleMenu.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -156,11 +150,12 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
             @Override
             public void onClick(View v) {
                 if (isTrackPlaying) {
-                    playPauseTrack_ib.setImageResource(android.R.drawable.ic_media_play);
+                    playPauseTrack_ib.setImageResource(android.R.drawable.ic_media_pause);
                     if (trackPosition == trackDuration && trackPosition > 0) {
                         Intent baseIntent = getActivity().getIntent();
                         tracksList = baseIntent.getParcelableArrayListExtra(getString(R.string.track_list_key));
                         currentPosition = baseIntent.getIntExtra(getString(R.string.track_position_key), -1);
+                        currentTrack = tracksList.get(currentPosition);
                         Intent startServiceIntent = new Intent(getActivity(), MediaService.class);
                         startServiceIntent.putParcelableArrayListExtra(getString(R.string.track_list_key), (ArrayList<? extends Parcelable>) tracksList);
                         startServiceIntent.putExtra(getString(R.string.track_position_key), currentPosition);
@@ -168,7 +163,7 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
                         getActivity().startService(startServiceIntent);
                     }
                 } else {
-                    playPauseTrack_ib.setImageResource(android.R.drawable.ic_media_pause);
+                    playPauseTrack_ib.setImageResource(android.R.drawable.ic_media_play);
                 }
                 Intent startServiceIntent = new Intent(getActivity(), MediaService.class);
                 startServiceIntent.setAction(MediaService.ACTION_PLAY);
@@ -185,7 +180,7 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
             }
         });
 
-        nextTrack_iv.setOnClickListener(new View.OnClickListener() {
+        nextTrack_ib.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent startServiceIntent = new Intent(getActivity(), MediaService.class);
@@ -250,6 +245,7 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
                     artistName_tv.setText(currentTrack.getArtistName());
                     albumName_tv.setText(currentTrack.getAlbumName());
                     mediaTrackName_tv.setText(currentTrack.getTrackName());
+                    previewUrl = currentTrack.getPreviewUrl();
                     if (null != currentTrack.getAlbumImageURL() && !currentTrack.getAlbumImageURL().isEmpty())
                         Picasso.with(getActivity()).load(currentTrack.getAlbumImageURL()).resize(IMG_SIZE, IMG_SIZE).centerCrop().into(albumImage_iv);
                 }
@@ -373,16 +369,11 @@ public class MediaPlayerActivityFragment extends Fragment implements MediaServic
                                 getActivity().startService(startServiceIntent);
                         }
                     } catch (InterruptedException e) {
-
                         e.printStackTrace();
                     }
-
-
                 }
             }
             return null;
         }
-
-
     }
 }

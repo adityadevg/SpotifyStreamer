@@ -157,11 +157,8 @@ public class TopTracksActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Tracks> tracksResult) {
             if (null != tracksResult) {
-                //artistArrayAdapter.clear();
-                // if no artist was found then display message
                 if (tracksResult.isEmpty())
-                    Toast.makeText(getActivity(), getString(R.string.no_results),
-                            (Toast.LENGTH_LONG)).show();
+                    Toast.makeText(getActivity(), getString(R.string.no_results), (Toast.LENGTH_LONG)).show();
                 else
                     tracksArrayAdapter.addAll(tracksResult);
             }
